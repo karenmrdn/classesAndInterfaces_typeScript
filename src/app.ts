@@ -1,11 +1,22 @@
-class Department {
+// !!! We cannot create an instance of an abstract class
+abstract class Department {
+  static fiscalYear = 2020;
+
   protected employees: string[] = [];
 
-  constructor(private readonly id: string, private name: string) {}
+  constructor(protected readonly id: string, private name: string) {}
 
-  describe(this: Department) {
-    console.log(`Department (${this.id}): ${this.name}`);
+  // Static properties and methods allow us add properties and methods to classes,
+  // which are not accessed on the instance of the class (we don't need to
+  // call new), but which we access directly on the class.
+  // !!! We cannot access static props and methods from-inside our non-static parts:
+  // this.fiscalYear - error, Department.fiscalYear - ok
+  // Example: Math.PI or Math.pow()
+  static createEmployee(name: string) {
+    return { name: name };
   }
+
+  abstract describe(this: Department): void;
 
   addEmployee(employee: string) {
     this.employees.push(employee);
@@ -20,6 +31,10 @@ class Department {
 class ITDepartment extends Department {
   constructor(id: string, public admins: string[]) {
     super(id, "IT");
+  }
+
+  describe() {
+    console.log("IT department id: " + this.id);
   }
 }
 
@@ -45,6 +60,10 @@ class AccountingDepartment extends Department {
     this.lastReport = reports[0];
   }
 
+  describe() {
+    console.log("Accounting department id: " + this.id);
+  }
+
   addEmployee(name: string) {
     if (name === "John") {
       console.log("John already fired!");
@@ -62,6 +81,10 @@ class AccountingDepartment extends Department {
     console.log(this.reports);
   }
 }
+
+const employee1 = Department.createEmployee("Anna");
+console.log(employee1);
+console.log(Department.fiscalYear);
 
 const it = new ITDepartment("i1", ["Andrew"]);
 
@@ -82,6 +105,7 @@ console.log(accounting);
 console.log(accounting.mostRecentReport);
 accounting.mostRecentReport = "Year end report";
 accounting.showReports();
+accounting.describe();
 
 // const accountingCopy = { describe: accounting.describe };
 // accountingCopy.describe(); // error in TS with this of type Department in the describe method
