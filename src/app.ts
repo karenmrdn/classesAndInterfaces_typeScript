@@ -38,8 +38,11 @@ class ITDepartment extends Department {
   }
 }
 
+// !!! Singleton pattern is about ensuring that we always have exactly one
+// instance of a certain class.
 class AccountingDepartment extends Department {
   private lastReport: string;
+  private static instance: AccountingDepartment;
 
   get mostRecentReport() {
     if (this.lastReport) {
@@ -55,9 +58,18 @@ class AccountingDepartment extends Department {
     this.addReport(value);
   }
 
-  constructor(id: string, private reports: string[]) {
+  private constructor(id: string, private reports: string[]) {
     super(id, "Accounting");
     this.lastReport = reports[0];
+  }
+
+  // !!! In a static method we can access static properties using this keyword
+  static getInstance() {
+    if (this.instance) {
+      return this.instance;
+    }
+    this.instance = new AccountingDepartment("d2", []);
+    return this.instance;
   }
 
   describe() {
@@ -96,7 +108,13 @@ it.describe();
 it.showEmployeeInfo();
 console.log(it);
 
-const accounting = new AccountingDepartment("a1", []);
+// const accounting = new AccountingDepartment("a1", []);
+// !!! SINGLETON
+const accounting = AccountingDepartment.getInstance();
+const accounting2 = AccountingDepartment.getInstance();
+console.log(accounting === accounting2);
+console.log(accounting, accounting2);
+
 accounting.addReport("Report1");
 accounting.addEmployee("John");
 accounting.addEmployee("Nick");
